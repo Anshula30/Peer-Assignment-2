@@ -254,3 +254,54 @@ p1 <- ggplot(data=fatal_events,
 
 grid.arrange(p1, p2, main="Top deadly weather events in the US (1950-2011)")
 ```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
+
+Tornadoes cause most number of deaths and injuries among all event types. There 
+are more than 5,000 deaths and more than 10,000 injuries in the last 60 years
+in US, due to tornadoes. 
+The other event types that are most dangerous with respect to population health
+are excessive heat and flash floods.
+
+Economic impact of weather events
+---------------------------------
+
+The following plot shows the most severe weather event types with respect to
+economic cost that they have costed since 1950s.
+
+
+
+```r
+library(ggplot2)
+library(gridExtra)
+# Set the levels in order
+p1 <- ggplot(data=prop_dmg_events,
+aes(x=reorder(EVTYPE, prop_dmg), y=log10(prop_dmg), fill=prop_dmg )) +
+    geom_bar(stat="identity") +
+    coord_flip() +
+    xlab("Event type") +
+    ylab("Property damage in dollars (log-scale)") +
+    theme(legend.position="none")
+
+p2 <- ggplot(data=crop_dmg_events,
+             aes(x=reorder(EVTYPE, crop_dmg), y=crop_dmg, fill=crop_dmg)) +
+    geom_bar(stat="identity") +
+    coord_flip() + 
+    xlab("Event type") +
+    ylab("Crop damage in dollars") + 
+    theme(legend.position="none")
+
+grid.arrange(p1, p2, main="Weather costs to the US economy (1950-2011)")
+```
+
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12.png) 
+
+Property damages are given in logarithmic scale due to large range of values.
+The data shows that flash floods and thunderstorm winds cost the largest
+property damages among weather-related natural diseasters. Note that, due to
+untidy nature of the available data, type `flood` and `flash flood` are
+separate values and should be merged for more accurate data-driven conclusions.
+
+The most severe weather event in terms of crop damage is the drought. In the last
+half century, the drought has caused more than 10 billion dollars damage. Other
+severe crop-damage-causing event types are floods and hails.
