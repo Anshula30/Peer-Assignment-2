@@ -137,3 +137,67 @@ In the raw data, the property damage is represented with two fields, a number
 `PROPDMG` in dollars and the exponent `PROPDMGEXP`. Similarly, the crop damage
 is represented using two fields, `CROPDMG` and `CROPDMGEXP`. The first step in the
 analysis is to calculate the property and crop damage for each event.
+
+
+```r
+exp_transform <- function(e) {
+    # h -> hundred, k -> thousand, m -> million, b -> billion
+    if (e %in% c('h', 'H'))
+        return(2)
+    else if (e %in% c('k', 'K'))
+        return(3)
+    else if (e %in% c('m', 'M'))
+        return(6)
+    else if (e %in% c('b', 'B'))
+        return(9)
+    else if (!is.na(as.numeric(e))) # if a digit
+        return(as.numeric(e))
+    else if (e %in% c('', '-', '?', '+'))
+        return(0)
+    else {
+        stop("Invalid exponent value.")
+    }
+}
+```
+
+```r
+prop_dmg_exp <- sapply(storm$PROPDMGEXP, FUN=exp_transform)
+storm$prop_dmg <- storm$PROPDMG * (10 ** prop_dmg_exp)
+crop_dmg_exp <- sapply(storm$CROPDMGEXP, FUN=exp_transform)
+storm$crop_dmg <- storm$CROPDMG * (10 ** crop_dmg_exp)
+```
+
+```r
+# Compute the economic loss by event type
+library(plyr)
+econ_loss <- ddply(storm, .(EVTYPE), summarize,
+                   prop_dmg = sum(prop_dmg),
+                   crop_dmg = sum(crop_dmg))
+
+# filter out events that caused no economic loss
+econ_loss <- econ_loss[(econ_loss$prop_dmg > 0 | econ_loss$crop_dmg > 0), ]
+prop_dmg_events <- head(econ_loss[order(econ_loss$prop_dmg, decreasing = T), ], 10)
+crop_dmg_events <- head(econ_loss[order(econ_loss$crop_dmg, decreasing = T), ], 10)
+```
+
+
+Top 10 events that caused most property damage (in dollars) are as follows
+
+
+```r
+prop_dmg_events[, c("EVTYPE", "prop_dmg")]
+```
+
+```
+##                 EVTYPE  prop_dmg
+## 132        flash flood 6.820e+13
+## 694 thunderstorm winds 2.087e+13
+## 737            tornado 1.079e+12
+## 203               hail 3.158e+11
+## 400          lightning 1.729e+11
+## 148              flood 1.447e+11
+## 361  hurricane typhoon 6.931e+10
+## 155           flooding 5.921e+10
+## 581        storm surge 4.332e+10
+## 264         heavy snow 1.793e+10
+```
