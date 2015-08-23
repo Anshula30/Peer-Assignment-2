@@ -1,6 +1,4 @@
-Health and Economic Impact of Weather Events in the US
-======================================================
-
+# Data Storm Analysis
 
 Storms and other severe weather events can cause both public health and economic
 problems for communities and municipalities. Many severe events can result in
@@ -12,9 +10,13 @@ Administration's (NOAA) storm database. This database tracks characteristics of 
 storms and weather events in the United States, including when and where they occur, as
 well as estimates of any fatalities, injuries, and property damage.
 
+Using the data we will answer the following questions
+1. Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?
 
-Synopsis
-========
+2. Across the United States, which types of events have the greatest economic consequences?
+
+
+## Synopsis
 
 The analysis on the storm event database revealed that tornadoes are the most
 dangerous weather event to the population health. The second most dangerous
@@ -24,8 +26,7 @@ in property damages between 1950 and 2011. The largest crop damage caused by
 drought, followed by flood and hails.
 
 
-Data Processing
-===============
+## Data Processing
 
 The analysis was performed on
 [Storm Events Database](http://www.ncdc.noaa.gov/stormevents/ftp.jsp), provided by
@@ -45,7 +46,6 @@ specific format. For instance, there are events with types `Frost/Freeze`,
 `FROST/FREEZE` and `FROST\\FREEZE` which obviously refer to the same type of
 event.
 
-
 ```r
 # number of unique event types
 length(unique(storm$EVTYPE))
@@ -54,7 +54,6 @@ length(unique(storm$EVTYPE))
 ```
 ## [1] 985
 ```
-
 
 ```r
 # translate all letters to lowercase
@@ -73,16 +72,13 @@ length(unique(event_types))
 storm$EVTYPE <- event_types
 ```
 
-
 No further data preprocessing was performed although the event type field can be
 processed further to merge event types such as `tstm wind` and `thunderstorm wind`. 
 After the cleaning, as expected, the number of unique event types reduce
 significantly. For further analysis, the cleaned event types are used.
 
 
-
-Dangerous Events with respect to Population Health
-================================================
+## Events with respect to Population Health
 
 To find the event types that are most harmful to population health, the number
 of casualties are aggregated by the event type.
@@ -122,13 +118,12 @@ fatal_events[, c("EVTYPE", "fatalities")]
 
 Top 10 events that caused most number of injuries are
 
-
 ```r
 injury_events[, c("EVTYPE", "injuries")]
 ```
 
-Economic Effects of Weather Events
-==================================
+
+## Economic Effects of Weather Events
 
 To analyze the impact of weather events on the economy, available property
 damage and crop damage reportings/estimates were used.
@@ -180,9 +175,7 @@ prop_dmg_events <- head(econ_loss[order(econ_loss$prop_dmg, decreasing = T), ], 
 crop_dmg_events <- head(econ_loss[order(econ_loss$crop_dmg, decreasing = T), ], 10)
 ```
 
-
 Top 10 events that caused most property damage (in dollars) are as follows
-
 
 ```r
 prop_dmg_events[, c("EVTYPE", "prop_dmg")]
@@ -202,9 +195,7 @@ prop_dmg_events[, c("EVTYPE", "prop_dmg")]
 ## 264         heavy snow 1.793e+10
 ```
 
-
 Similarly, the events that caused biggest crop damage are
-
 
 ```r
 crop_dmg_events[, c("EVTYPE", "crop_dmg")]
@@ -224,14 +215,13 @@ crop_dmg_events[, c("EVTYPE", "crop_dmg")]
 ## 179      frost freeze 1.094e+09
 ```
 
-Results
-=======
+
+## Results
 
 Health impact of weather events
--------------------------------
+===============================
 
 The following plot shows top dangerous weather event types.
-
 
 ```r
 library(ggplot2)
@@ -255,8 +245,6 @@ p1 <- ggplot(data=fatal_events,
 grid.arrange(p1, p2, main="Top deadly weather events in the US (1950-2011)")
 ```
 
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11.png) 
-
 Tornadoes cause most number of deaths and injuries among all event types. There 
 are more than 5,000 deaths and more than 10,000 injuries in the last 60 years
 in US, due to tornadoes. 
@@ -264,12 +252,10 @@ The other event types that are most dangerous with respect to population health
 are excessive heat and flash floods.
 
 Economic impact of weather events
----------------------------------
+=================================
 
 The following plot shows the most severe weather event types with respect to
 economic cost that they have costed since 1950s.
-
-
 
 ```r
 library(ggplot2)
@@ -293,8 +279,6 @@ p2 <- ggplot(data=crop_dmg_events,
 
 grid.arrange(p1, p2, main="Weather costs to the US economy (1950-2011)")
 ```
-
-![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12.png) 
 
 Property damages are given in logarithmic scale due to large range of values.
 The data shows that flash floods and thunderstorm winds cost the largest
