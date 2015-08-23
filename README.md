@@ -201,3 +201,56 @@ prop_dmg_events[, c("EVTYPE", "prop_dmg")]
 ## 581        storm surge 4.332e+10
 ## 264         heavy snow 1.793e+10
 ```
+
+
+Similarly, the events that caused biggest crop damage are
+
+
+```r
+crop_dmg_events[, c("EVTYPE", "crop_dmg")]
+```
+
+```
+##                EVTYPE  crop_dmg
+## 77            drought 1.397e+10
+## 148             flood 5.662e+09
+## 515       river flood 5.029e+09
+## 377         ice storm 5.022e+09
+## 203              hail 3.026e+09
+## 352         hurricane 2.742e+09
+## 361 hurricane typhoon 2.608e+09
+## 132       flash flood 1.421e+09
+## 118      extreme cold 1.313e+09
+## 179      frost freeze 1.094e+09
+```
+
+Results
+=======
+
+Health impact of weather events
+-------------------------------
+
+The following plot shows top dangerous weather event types.
+
+
+```r
+library(ggplot2)
+library(gridExtra)
+# Set the levels in order
+p1 <- ggplot(data=fatal_events,
+             aes(x=reorder(EVTYPE, fatalities), y=fatalities, fill=fatalities)) +
+    geom_bar(stat="identity") +
+    coord_flip() +
+    ylab("Total number of fatalities") +
+    xlab("Event type") +
+    theme(legend.position="none")
+    p2 <- ggplot(data=injury_events,
+             aes(x=reorder(EVTYPE, injuries), y=injuries, fill=injuries)) +
+    geom_bar(stat="identity") +
+    coord_flip() + 
+    ylab("Total number of injuries") +
+    xlab("Event type") +
+    theme(legend.position="none")
+
+grid.arrange(p1, p2, main="Top deadly weather events in the US (1950-2011)")
+```
