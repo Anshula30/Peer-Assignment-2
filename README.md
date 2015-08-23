@@ -72,3 +72,68 @@ length(unique(event_types))
 # update the data frame
 storm$EVTYPE <- event_types
 ```
+
+
+No further data preprocessing was performed although the event type field can be
+processed further to merge event types such as `tstm wind` and `thunderstorm wind`. 
+After the cleaning, as expected, the number of unique event types reduce
+significantly. For further analysis, the cleaned event types are used.
+
+
+
+Dangerous Events with respect to Population Health
+================================================
+
+To find the event types that are most harmful to population health, the number
+of casualties are aggregated by the event type.
+
+
+```r
+library(plyr)
+casualties <- ddply(storm, .(EVTYPE), summarize,
+                    fatalities = sum(FATALITIES),
+                    injuries = sum(INJURIES))
+
+# Find events that caused most death and injury
+fatal_events <- head(casualties[order(casualties$fatalities, decreasing = T), ], 10)
+injury_events <- head(casualties[order(casualties$injuries, decreasing = T), ], 10)
+```
+
+Top 10 events that caused largest number of deaths are
+
+
+```r
+fatal_events[, c("EVTYPE", "fatalities")]
+```
+
+```
+##             EVTYPE fatalities
+## 737        tornado       5633
+## 109 excessive heat       1903
+## 132    flash flood        978
+## 234           heat        937
+## 400      lightning        816
+## 760      tstm wind        504
+## 148          flood        470
+## 511    rip current        368
+## 309      high wind        248
+## 11       avalanche        224
+```
+
+Top 10 events that caused most number of injuries are
+
+
+```r
+injury_events[, c("EVTYPE", "injuries")]
+```
+
+Economic Effects of Weather Events
+==================================
+
+To analyze the impact of weather events on the economy, available property
+damage and crop damage reportings/estimates were used.
+
+In the raw data, the property damage is represented with two fields, a number
+`PROPDMG` in dollars and the exponent `PROPDMGEXP`. Similarly, the crop damage
+is represented using two fields, `CROPDMG` and `CROPDMGEXP`. The first step in the
+analysis is to calculate the property and crop damage for each event.
